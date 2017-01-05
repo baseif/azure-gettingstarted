@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vaultName": {
+      "type": "string"
+    },
+    "backupPolicyName": {
+      "type": "string"
+    },
+    "backupPolicyRunDays": {
+      "type": "array",
+      "metadata": {
+        "description": "A list of days of the week that the backup process will actually as well as which days will actually be part of the retention process."
+      }
+    },
+    "backupPolicyRunTime": {
+      "type": "array",
+      "metadata": {
+        "description": "All times should be expressed in UTC, by adding a Z at the end of each string. In addition, all times should have 0 seconds and should be either on the hour or half hour."
+      }
+    },
+    "weeklyRetentionDurationCount": {
+      "type": "int",
+      "metadata": { "description": "Number of weeks that should be maintained for each VM backup." }
+    }
+  },
+  "variables": {
+
+  },
+  "resources": [
+    {
+      "name": "[parameters('vaultName')]",
+      "type": "Microsoft.RecoveryServices/vaults",
+      "apiversion": "2016-06-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "RS0",
+        "tier": "Standard"
+      },
+      "dependsOn": [],
+      "properties": {}
+    },
+    {
+      "name": "[concat(parameters('vaultName'), '/', parameters('backupPolicyName'))]",
+      "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+      "apiVersion": "2016-06-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [ "[concat('Microsoft.RecoveryServices/vaults/', parameters('vaultName'))]" ],
+      "properties": {
+        "backupManagementType": "AzureIaasVM",
+        "schedulePolicy": {
+          "scheduleRunFrequency": "Weekly",
+          "scheduleRunDays": "[parameters('backupPolicyRunDays')]",
+          "scheduleRunTimes": "[parameters('backupPolicyRunTime')]",
+          "schedulePolicyType": "SimpleSchedulePolicy"
+        },
+        "retentionPolicy": {
+          "dailySchedule": null,
+          "weeklySchedule": {
+            "daysOfTheWeek": "[parameters('backupPolicyRunDays')]",
+            "retentionTimes": "[parameters('backupPolicyRunTime')]",
+            "retentionDuration": {
+              "count": "[parameters('weeklyRetentionDurationCount')]",
+              "durationType": "Weeks"
+            }
+          },
+          "monthlySchedule": null,
+          "yearlySchedule": null,
+          "retentionPolicyType": "LongTermRetentionPolicy"
+        }
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vaultName": {
+      "value": "GettingStarted-BackupVault"
+    },
+    "backupPolicyName": {
+      "value": "DefaultWeeklyPolicy"
+    },
+    "backupPolicyRunDays": {
+      "value": [ "Monday", "Wednesday", "Friday" ]
+    },
+    "backupPolicyRunTime": {
+      "value": [ "2016-12-19T09:30:00Z" ]
+    },
+    "weeklyRetentionDurationCount": {
+      "value": 52
+    }
+  }
+}
